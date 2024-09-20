@@ -24,7 +24,7 @@ class Api::V1::UsersController < Api::V1::BaseController
         else
           render json: { error: 'Event is full. No more registrations allowed.' }, status: :unprocessable_entity
         end
-      end
+    end
 
       def un_rsvp
         event = Event.find_by(id: params[:event_id]) 

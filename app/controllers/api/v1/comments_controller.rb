@@ -31,9 +31,19 @@ class Api::V1::CommentsController < Api::V1::BaseController
           render json: { error: 'Event not found.' }, status: :not_found
         end
       end
+
+      def delete_comment
+        comment = Comment.find_by(id: params[:id])
       
+        if comment
+          comment.destroy
+          render json: { message: 'Comment deleted successfully.' }, status: :ok
+        else
+          render json: { error: 'Comment not found.' }, status: :not_found
+        end
+      rescue => e
+        render json: { error: 'Failed to delete comment.', details: e.message }, status: :unprocessable_entity
+      end
       
-      
-   
       
 end

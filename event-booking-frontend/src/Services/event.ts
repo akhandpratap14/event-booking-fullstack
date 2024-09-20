@@ -9,19 +9,17 @@ const useEvent = () => {
   };
 
   const getOneEvent = async ({ queryKey }) => {
-    const id = queryKey[0];
+    const id = queryKey[1];
     const response = await api.get(`events/${id}`);
     return response.data;
   };
 
   const boolRsvp = async (obj: { event_id: any; email: string }) => {
-    console.log(obj);
     const response = await api.post("rsvp", obj);
     return response.data;
   };
 
   const unBoolRsvp = async (obj: { event_id: any; email: string }) => {
-    console.log(obj);
     const response = await api.post("un_rsvp", obj);
     return response.data;
   };
@@ -31,9 +29,14 @@ const useEvent = () => {
     return res.data;
   };
 
+  const deleteComment = async (id: any) => {
+    const res = await api.post(`comment-delete/${id}`);
+    return res.data;
+  };
+
   const getAllComment = async ({ queryKey }) => {
-    const id = queryKey[0];
-    const res = await api.get(`comments`, id);
+    const id = queryKey[1];
+    const res = await api.get(`comments/${id}`);
     return res.data;
   };
 
@@ -44,6 +47,7 @@ const useEvent = () => {
     getOneEvent,
     getAllComment,
     unBoolRsvp,
+    deleteComment,
   };
 };
 

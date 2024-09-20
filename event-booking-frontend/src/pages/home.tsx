@@ -3,11 +3,14 @@ import useEvent from "../Services/event";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import useSignOut from "react-auth-kit/hooks/useSignOut";
 
 const Home = () => {
   const { allEvents, boolRsvp, unBoolRsvp } = useEvent();
 
   const navigate = useNavigate();
+
+  const signOut = useSignOut();
 
   const [location, setLocation] = useState("");
   const [title, setTitle] = useState("");
@@ -22,24 +25,20 @@ const Home = () => {
   const eventMutation = useMutation({
     mutationFn: boolRsvp,
     onSuccess: () => {
-      console.log("dfvdgr");
       toast.success("Booked");
     },
     onError: () => {
-      console.log("dfvdgr");
       toast.error("Already booked");
     },
   });
 
   const UneventMutation = useMutation({
     mutationFn: unBoolRsvp,
-    onSuccess: () => {
-      console.log("dfvdgr");
-      toast.success("Booked");
+    onSuccess: (data) => {
+      toast.success(data.message);
     },
-    onError: () => {
-      console.log("dfvdgr");
-      toast.error("Already booked");
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -80,7 +79,13 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="h-12 w-48 text-white rounded-lg bg-[#3b50e0] flex items-center justify-center">
+        <div
+          onClick={() => {
+            signOut();
+            navigate("/");
+          }}
+          className="h-12 w-48 cursor-pointer hover:scale-105 transition-all duration-150 ease-in-out text-white rounded-lg bg-[#3b50e0] flex items-center justify-center"
+        >
           Log out
         </div>
       </div>
@@ -90,7 +95,6 @@ const Home = () => {
           {`Welcome back ${getAuthState()?.name || "Guest"}`}
         </div>
 
-        {/* Input fields for filtering */}
         <div className="px-5 py-4 flex gap-x-4">
           <input
             type="text"

@@ -44,6 +44,10 @@ const SignIn = () => {
         navigate("/home");
       }
     },
+    onError: (err) => {
+      navigate("/register");
+      toast.error(err.message);
+    },
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {

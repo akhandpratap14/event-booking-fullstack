@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useEvent from "../Services/event";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const EventPage = () => {
   const getAuthState = () => {
@@ -13,9 +14,10 @@ const EventPage = () => {
     }
     return data;
   };
+
   const { id } = useParams();
 
-  const { getOneEvent, getAllComment, postComment } = useEvent();
+  const { getOneEvent, postComment, deleteComment } = useEvent();
 
   const queryClient = useQueryClient();
 
@@ -30,29 +32,35 @@ const EventPage = () => {
     PostCommentMutation.mutate(obj);
   };
 
-  const { data: event, isEventLoading } = useQuery({
-    queryKey: [id],
+  const { data: event, isLoading } = useQuery({
+    queryKey: ["events", id],
     queryFn: getOneEvent,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
 
-  const { data: comments, isLoading } = useQuery({
-    queryKey: [id],
-    queryFn: getAllComment,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-  });
-
-  console.log(isLoading ? "loading" : comments.comments);
-
   const PostCommentMutation = useMutation({
     mutationFn: postComment,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       if (id) {
-        queryClient.invalidateQueries({ queryKey: [id] });
+        queryClient.invalidateQueries({ queryKey: ["events"] });
       }
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const DeleteCommentMutation = useMutation({
+    mutationFn: deleteComment,
+    onSuccess: () => {
+      toast.success("Deleted");
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: ["events"] });
+      }
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -74,13 +82,21 @@ const EventPage = () => {
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Comments</h2>
         <div className="space-y-4">
-          {comments?.comments?.map((comment: any) => (
+          {event?.comments?.map((comment: any) => (
             <div key={comment.id} className="border p-2 rounded-md">
               <div className="flex justify-between">
                 <span className="font-bold">{comment.user.name}</span>
                 <span className="text-gray-500 text-sm">
                   {new Date(comment.created_at).toLocaleString()}
                 </span>
+                <div
+                  onClick={() => {
+                    DeleteCommentMutation.mutate(comment.id);
+                  }}
+                  className="bg-red-500 text-white h-12 w-24 rounded-lg cursor-pointer flex justify-center items-center"
+                >
+                  delete
+                </div>
               </div>
               <p>{comment.content}</p>
             </div>

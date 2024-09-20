@@ -18,7 +18,8 @@ Rails.application.routes.draw do
       post 'un_rsvp', to: 'users#un_rsvp'
 
       post 'comments', to: 'comments#create'
-      get 'comments', to: 'comments#index'
+      get 'comments/:id', to: 'comments#index'
+      post 'comment-delete/:id', to: 'comments#delete_comment'
 
     end
   end  
